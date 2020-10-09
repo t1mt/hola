@@ -75,6 +75,14 @@ func remote(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	newReq.Header.Add("x-request-id", r.Header.Get("x-request-id"))
+	newReq.Header.Add("x-b3-traceid", r.Header.Get("x-b3-traceid"))
+	newReq.Header.Add("x-b3-spanid", r.Header.Get("x-b3-spanid"))
+	newReq.Header.Add("x-b3-parentspanid", r.Header.Get("x-b3-parentspanid"))
+	newReq.Header.Add("x-b3-sampled", r.Header.Get("x-b3-sampled"))
+	newReq.Header.Add("x-b3-flags", r.Header.Get("x-b3-flags"))
+	newReq.Header.Add("x-ot-span-context", r.Header.Get("x-ot-span-context"))
+
 	resp, err := client.Do(newReq)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
