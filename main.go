@@ -54,6 +54,11 @@ func remote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("=== Request ===")
+	fmt.Printf("serverName: %s", r.Host)
+	fmt.Printf("requestURI: %s", r.RequestURI)
+	fmt.Printf("remoteAddr: %s", r.RemoteAddr)
+
 	newReq := &http.Request{
 		Method:     r.Method,
 		Host:       purl.Host,
@@ -92,6 +97,10 @@ func remote(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(fmt.Sprintf("<h1>Response from '%s' </h1><br>\r\n", p)))
 	io.Copy(w, resp.Body)
+
+	for key, value := range newReq.Header {
+		fmt.Printf("%s:%s\n", key, value)
+	}
 }
 
 const (
