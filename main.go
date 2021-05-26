@@ -88,19 +88,26 @@ func remote(w http.ResponseWriter, r *http.Request) {
 	newReq.Header.Add("x-b3-flags", r.Header.Get("x-b3-flags"))
 	newReq.Header.Add("x-ot-span-context", r.Header.Get("x-ot-span-context"))
 
+	start := time.Now()
 	resp, err := client.Do(newReq)
+	latency := time.Since(start)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
+		fmt.Printf("error: %v", err)
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf("<h1>Response from '%s' </h1><br>\r\n", p)))
+	w.Write([]byte(fmt.Sprintf("<h1>%dms %s - Response from '%s' </h1><br>\r\n",
+		latency.Milliseconds(), resp.Status, p)))
 	io.Copy(w, resp.Body)
 
 	for key, value := range newReq.Header {
 		fmt.Printf("%s:%s\n", key, value)
 	}
+
+	fmt.Println("=== Remote Response ===")
+	fmt.Printf("%s %s %s %dms \n", r.Method, p, resp.Status, latency.Milliseconds())
 }
 
 const (
